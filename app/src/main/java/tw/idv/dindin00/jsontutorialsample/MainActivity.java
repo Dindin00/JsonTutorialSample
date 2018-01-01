@@ -76,5 +76,11 @@ public class MainActivity extends AppCompatActivity {
                 ((TextView) findViewById(R.id.show)).setText("獲取資料失敗");
             }
         });
+
+        //為jsonObjectRequest套上標籤方便管理
+        jsonObjectRequest.setTag(jsonTAG);
+
+        //將設定好的jsonObjectRequest放入佇列開始工作
+        requestQueue.add(jsonObjectRequest);
     }
 }
