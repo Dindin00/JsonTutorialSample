@@ -83,4 +83,15 @@ public class MainActivity extends AppCompatActivity {
         //將設定好的jsonObjectRequest放入佇列開始工作
         requestQueue.add(jsonObjectRequest);
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //APP結束後要關閉網路連線工作
+        //如果佇列不是空的就代表有工作
+        if (requestQueue != null) {
+            //將抓取json資料的工作取消
+            requestQueue.cancelAll(jsonTAG);
+        }
+    }
 }
