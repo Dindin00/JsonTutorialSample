@@ -2,6 +2,7 @@ package tw.idv.dindin00.jsontutorialsample;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -10,6 +11,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
@@ -40,15 +43,37 @@ public class MainActivity extends AppCompatActivity {
         jsonTAG = "getOpenData";
         //初始化jsonObjectRequest，並進行json解析
         jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, jsonUrl, null, new Response.Listener<JSONObject>() {
+            //此處用於處理成功取得Json資料後的動作
             @Override
             public void onResponse(JSONObject response) {
                 //初始化結果文字確保每次內容不會混雜在一起
                 result = "";
+                //網路處理可能會有錯誤因此都需要做try catch
+                try {
+                    //response已經剝去原本JSON資料的物件外殼，
+                    //接著要剝去result物件外殼
+                    JSONObject JO_result = response.getJSONObject("result");
+                    //接著要剝去records陣列外殼
+                    JSONArray JA_records = JO_result.getJSONArray("records");
+                    //用迴圈讀出每個陣列裡面的JSON物件的內容
+                    for (int i = 0; i < JA_records.length(); i++) {
+                        JSONObject temp = JA_records.getJSONObject(i);
+                        //將讀出來的內容存至結果文字中
+                        result += temp.getString("name") + "：" + temp.getString("address") + "\n";
+                    }
+                    //將結果文字顯示在TextView上
+                    ((TextView) findViewById(R.id.show)).setText(result);
+                } catch (JSONException e) {
+                    //將錯誤訊息顯示在TextView上
+                    ((TextView) findViewById(R.id.show)).setText(e.toString());
+                }
             }
         }, new Response.ErrorListener() {
+            //此處用於處理無法取得Json資料的動作
             @Override
             public void onErrorResponse(VolleyError error) {
-
+                //顯示獲取資料失敗在TextView上
+                ((TextView) findViewById(R.id.show)).setText("獲取資料失敗");
             }
         });
     }
